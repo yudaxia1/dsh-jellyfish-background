@@ -1,0 +1,46 @@
+.row {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 0.5px solid var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-primary);
+}
+
+.copy {
+  display: grid;
+  gap: 3px;
+}
+
+.title {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.description {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.toggle, .slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.toggle input, .slider input {
+  accent-color: var(--dsw-alias-brand-primary);
+}
+
+.slider input {
+  flex: 1;
+  min-width: 90px;
+}
+
+.slider output {
+  min-width: 3.5em;
+  text-align: right;
+  color: var(--dsw-alias-label-secondary);
+  font-variant-numeric: tabular-nums;
+}
