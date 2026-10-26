@@ -1,6 +1,6 @@
 # DSH 深海字符水母背景 / Deep-Sea ASCII Jellyfish Background
 
-[中文](#中文) · [English](#english) · [视觉需求说明 / Visual brief](docs/visual-brief.md)
+[中文](#中文) · [English](#english)
 
 ![DSH 实际运行中的水母背景动图 / Animated demo in DSH](assets/demo.gif)
 

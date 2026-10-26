@@ -1,6 +1,6 @@
 # DSH 深海字符水母背景
 
-[English](README.md#english) · [视觉需求说明](docs/visual-brief.md)
+[English](README.md#english)
 
 ![DSH 实际运行中的水母背景动图](assets/demo.gif)
 
