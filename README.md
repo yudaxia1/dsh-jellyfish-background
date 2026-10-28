@@ -20,45 +20,24 @@
 
 页面隐藏时停止绘制；系统开启“减少动态效果”或动效强度设为 0 时显示静态画面。设置保存在当前浏览器的 `localStorage`，同一来源的多个标签页会同步。
 
-### 快速安装（macOS / Linux，Web）
+### 在线安装（Web）
 
-插件已在 DSH `0.2.1-rc.2` 和 `0.2.1-rc.3` 实测；其他版本尚未验证。下面的命令可在任意目录运行，无需克隆仓库。若普通 `dsh` 命令不是这两个版本之一，先把 `DSH_BIN` 指向受支持版本的可执行文件，例如 `export DSH_BIN="/path/to/dsh"`。安装插件和随后启动 Web **必须使用同一个 DSH 可执行文件及同一个 `DSH_HOME`**。
-
-```sh
-DSH_BIN="${DSH_BIN:-dsh}"
-"$DSH_BIN" --version  # 确认输出 0.2.1-rc.2 或 0.2.1-rc.3，再继续
-
-PKG_DIR="${DSH_HOME:-$HOME/.dsh}/plugin-packages"
-mkdir -p "$PKG_DIR"
-curl -fL --retry 3 \
-  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz" \
-  -o "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
-
-"$DSH_BIN" plugin --profile web add \
-  "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
-```
-
-先停止旧的 Web 进程，再在同一个终端运行：
+适用于 DSH `0.2.1-rc.2` 和 `0.2.1-rc.3`。macOS、Linux、Windows 都可以在任意目录运行以下命令，**无需手动下载安装包或克隆仓库**：
 
 ```sh
-"$DSH_BIN" web
+dsh --version
+dsh plugin --profile web add https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz
 ```
 
-压缩包保存在持久目录中，避免临时目录清理后 profile 引用的本地依赖路径失效。启动后到 **设置 → 通用设置 → 深海字符水母** 查看开关和强度滑块。
+第一行应输出 `0.2.1-rc.2` 或 `0.2.1-rc.3`。安装完成后，**先停止旧的 Web 进程**，再运行：
 
-### Windows / Desktop
-
-Windows PowerShell 可先克隆或下载仓库，在仓库根目录执行。若普通 `dsh` 不是受支持版本，把 `$DshBin` 改为该版本的可执行文件路径：
-
-```powershell
-$DshBin = 'dsh'
-& $DshBin --version  # 确认输出 0.2.1-rc.2 或 0.2.1-rc.3
-& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.5.tgz'
-# 停止旧的 Web 进程后，再执行：
-& $DshBin web
+```sh
+dsh web
 ```
 
-安装版 Desktop 首次启动并初始化 profile 后，完全退出应用，再使用该安装版附带的 `dsh` 命令和 `--profile desktop` 安装同一个压缩包，然后重新打开应用。卸载时使用 `dsh plugin --profile web remove dsh-background-style-plugin`；Desktop 则把 `web` 换成 `desktop`。
+安装和启动要使用**同一个 `dsh` 可执行文件及同一个 `DSH_HOME`**。如果机器上有多个 DSH 版本，把上述每处 `dsh` 换成受支持版本的完整路径。启动后在 **设置 → 通用设置 → 深海字符水母** 调整开关和强度。
+
+Desktop：首次打开并初始化 profile 后完全退出应用，使用安装版附带的 `dsh` 命令把上述安装命令中的 `--profile web` 改为 `--profile desktop`，然后重新打开应用。
 
 ### 从源码构建
 
@@ -91,45 +70,24 @@ The background starts enabled on first install. Open **Settings → General → 
 
 The animation pauses when the page is hidden. Reduced-motion mode and intensity 0 render a static scene. Preferences use browser `localStorage` and synchronize across tabs on the same origin.
 
-### Quick install (macOS / Linux, Web)
+### Online install (Web)
 
-This package has been tested with DSH `0.2.1-rc.2` and `0.2.1-rc.3`; other versions remain unverified. Run these commands from any directory; cloning the repository is unnecessary. If your default `dsh` is another version, first point `DSH_BIN` to a supported executable, for example `export DSH_BIN="/path/to/dsh"`. **Use the same DSH executable and `DSH_HOME` to install the plugin and restart Web.**
-
-```sh
-DSH_BIN="${DSH_BIN:-dsh}"
-"$DSH_BIN" --version  # Confirm 0.2.1-rc.2 or 0.2.1-rc.3 before continuing
-
-PKG_DIR="${DSH_HOME:-$HOME/.dsh}/plugin-packages"
-mkdir -p "$PKG_DIR"
-curl -fL --retry 3 \
-  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz" \
-  -o "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
-
-"$DSH_BIN" plugin --profile web add \
-  "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
-```
-
-Stop the old Web process, then run in the same shell:
+Works with DSH `0.2.1-rc.2` and `0.2.1-rc.3`. Run these commands from any directory on macOS, Linux, or Windows. **No manual package download or repository clone is needed.**
 
 ```sh
-"$DSH_BIN" web
+dsh --version
+dsh plugin --profile web add https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz
 ```
 
-The persistent package directory keeps the local dependency path available after temporary files are cleaned. Open **Settings → General → Deep-sea ASCII jellyfish** for the toggle and intensity slider.
+The first command should print `0.2.1-rc.2` or `0.2.1-rc.3`. After installation, **stop the old Web process**, then run:
 
-### Windows / Desktop
-
-On Windows, clone or download the repository first. Run these commands from its root in PowerShell. If plain `dsh` is not a supported version, set `$DshBin` to that version's executable path:
-
-```powershell
-$DshBin = 'dsh'
-& $DshBin --version  # Confirm 0.2.1-rc.2 or 0.2.1-rc.3
-& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.5.tgz'
-# Stop the old Web process, then run:
-& $DshBin web
+```sh
+dsh web
 ```
 
-For installed Desktop, launch it once, quit fully, then use its bundled `dsh` command with `--profile desktop` to add the same package and reopen the app.
+Use the **same `dsh` executable and `DSH_HOME`** for installation and launch. If multiple DSH versions are installed, replace each `dsh` above with the full path to a supported version. Open **Settings → General → Deep-sea ASCII jellyfish** for the toggle and intensity slider.
+
+Desktop: launch it once to initialize its profile, quit fully, use the installed app's bundled `dsh` command with `--profile desktop` in the installation command above, then reopen the app.
 
 ### Build from source
 
