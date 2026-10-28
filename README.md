@@ -20,22 +20,45 @@
 
 页面隐藏时停止绘制；系统开启“减少动态效果”或动效强度设为 0 时显示静态画面。设置保存在当前浏览器的 `localStorage`，同一来源的多个标签页会同步。
 
-### 安装
+### 快速安装（macOS / Linux，Web）
 
-需要 DSH `0.2.1-rc.3`。使用仓库中的安装包，安装到 Web profile 后重启 DSH：
+插件仅兼容 DSH `0.2.1-rc.3`。下面的命令可在任意目录运行，无需克隆仓库。若普通 `dsh` 命令不是 `rc.3`，先把 `DSH_BIN` 指向 `rc.3` 的可执行文件，例如 `export DSH_BIN="/path/to/rc.3/bin/dsh"`。安装插件和随后启动 Web **必须使用同一个 `rc.3` 可执行文件及同一个 `DSH_HOME`**。
 
-```powershell
-dsh plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.4.tgz'
-dsh web
+```sh
+DSH_BIN="${DSH_BIN:-dsh}"
+"$DSH_BIN" --version  # 确认输出 0.2.1-rc.3，再继续
+
+PKG_DIR="${DSH_HOME:-$HOME/.dsh}/plugin-packages"
+mkdir -p "$PKG_DIR"
+curl -fL --retry 3 \
+  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.4.tgz" \
+  -o "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
+
+"$DSH_BIN" plugin --profile web add \
+  "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
 ```
 
-安装版 Desktop 首次启动并初始化 profile 后，完全退出应用，再使用该安装版附带的 `dsh` 命令：
+先停止旧的 Web 进程，再在同一个终端运行：
 
-```powershell
-dsh plugin --profile desktop add 'D:\path\to\dsh-background-style-plugin-0.1.4.tgz'
+```sh
+"$DSH_BIN" web
 ```
 
-重新打开 DSH 后首次默认开启。卸载时使用 `dsh plugin --profile web remove dsh-background-style-plugin`，Desktop 则把 `web` 换成 `desktop`。
+压缩包保存在持久目录中，避免临时目录清理后 profile 引用的本地依赖路径失效。启动后到 **设置 → 通用设置 → 深海字符水母** 查看开关和强度滑块。
+
+### Windows / Desktop
+
+Windows PowerShell 可先克隆或下载仓库，在仓库根目录执行。若普通 `dsh` 不是 `rc.3`，把 `$DshBin` 改为该版本的可执行文件路径：
+
+```powershell
+$DshBin = 'dsh'
+& $DshBin --version  # 确认输出 0.2.1-rc.3
+& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.4.tgz'
+# 停止旧的 Web 进程后，再执行：
+& $DshBin web
+```
+
+安装版 Desktop 首次启动并初始化 profile 后，完全退出应用，再使用该安装版附带的 `dsh` 命令和 `--profile desktop` 安装同一个压缩包，然后重新打开应用。卸载时使用 `dsh plugin --profile web remove dsh-background-style-plugin`；Desktop 则把 `web` 换成 `desktop`。
 
 ### 从源码构建
 
@@ -68,16 +91,45 @@ The background starts enabled on first install. Open **Settings → General → 
 
 The animation pauses when the page is hidden. Reduced-motion mode and intensity 0 render a static scene. Preferences use browser `localStorage` and synchronize across tabs on the same origin.
 
-### Install
+### Quick install (macOS / Linux, Web)
 
-Use DSH `0.2.1-rc.3`. Install the included package into the Web profile and restart DSH:
+This package requires DSH `0.2.1-rc.3`. Run these commands from any directory; cloning the repository is unnecessary. If your default `dsh` is another version, first point `DSH_BIN` to the `rc.3` executable, for example `export DSH_BIN="/path/to/rc.3/bin/dsh"`. **Use the same `rc.3` executable and `DSH_HOME` to install the plugin and restart Web.**
 
 ```sh
-dsh plugin --profile web add ./dist/dsh-background-style-plugin-0.1.4.tgz
-dsh web
+DSH_BIN="${DSH_BIN:-dsh}"
+"$DSH_BIN" --version  # Confirm 0.2.1-rc.3 before continuing
+
+PKG_DIR="${DSH_HOME:-$HOME/.dsh}/plugin-packages"
+mkdir -p "$PKG_DIR"
+curl -fL --retry 3 \
+  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.4.tgz" \
+  -o "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
+
+"$DSH_BIN" plugin --profile web add \
+  "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
 ```
 
-For installed Desktop, launch it once, quit fully, then use its bundled `dsh` command with `--profile desktop` and reopen the app. The plugin enables itself on first install; find its toggle and strength slider under **Settings → General**.
+Stop the old Web process, then run in the same shell:
+
+```sh
+"$DSH_BIN" web
+```
+
+The persistent package directory keeps the local dependency path available after temporary files are cleaned. Open **Settings → General → Deep-sea ASCII jellyfish** for the toggle and intensity slider.
+
+### Windows / Desktop
+
+On Windows, clone or download the repository first. Run these commands from its root in PowerShell. If plain `dsh` is not `rc.3`, set `$DshBin` to that version's executable path:
+
+```powershell
+$DshBin = 'dsh'
+& $DshBin --version  # Confirm 0.2.1-rc.3
+& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.4.tgz'
+# Stop the old Web process, then run:
+& $DshBin web
+```
+
+For installed Desktop, launch it once, quit fully, then use its bundled `dsh` command with `--profile desktop` to add the same package and reopen the app.
 
 ### Build from source
 
