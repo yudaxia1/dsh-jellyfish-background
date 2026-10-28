@@ -1,6 +1,6 @@
 {
   "name": "dsh-background-style-plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Full-window animated deep-sea ASCII jellyfish theme for DSH Web",
   "type": "module",
   "main": "lib/index.js",
@@ -33,10 +33,7 @@
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",
-    "dsh": "0.2.1-rc.3"
-  },
-  "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.5"
+    "dsh": "0.2.1-rc.2 || 0.2.1-rc.3"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:~",

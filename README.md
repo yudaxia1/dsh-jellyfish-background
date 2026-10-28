@@ -10,7 +10,7 @@
 
 ## 中文
 
-适用于 DSH `0.2.1-rc.3` Web 界面的动态主题插件。它在整个应用窗口后方绘制字符方格水母、暗蓝网格和漂浮星点，并把面板切换为深色半透明外观。DSH 原有的侧边栏、聊天、设置和输入功能继续使用。
+适用于 DSH `0.2.1-rc.2` 和 `0.2.1-rc.3` Web 界面的动态主题插件。它在整个应用窗口后方绘制字符方格水母、暗蓝网格和漂浮星点，并把面板切换为深色半透明外观。DSH 原有的侧边栏、聊天、设置和输入功能继续使用。
 
 动画由 Canvas 实时绘制，不依赖远程图片或视频；背景不拦截鼠标与键盘，页面隐藏时暂停，并响应系统“减少动态效果”设置。
 
@@ -22,20 +22,20 @@
 
 ### 快速安装（macOS / Linux，Web）
 
-插件仅兼容 DSH `0.2.1-rc.3`。下面的命令可在任意目录运行，无需克隆仓库。若普通 `dsh` 命令不是 `rc.3`，先把 `DSH_BIN` 指向 `rc.3` 的可执行文件，例如 `export DSH_BIN="/path/to/rc.3/bin/dsh"`。安装插件和随后启动 Web **必须使用同一个 `rc.3` 可执行文件及同一个 `DSH_HOME`**。
+插件已在 DSH `0.2.1-rc.2` 和 `0.2.1-rc.3` 实测；其他版本尚未验证。下面的命令可在任意目录运行，无需克隆仓库。若普通 `dsh` 命令不是这两个版本之一，先把 `DSH_BIN` 指向受支持版本的可执行文件，例如 `export DSH_BIN="/path/to/dsh"`。安装插件和随后启动 Web **必须使用同一个 DSH 可执行文件及同一个 `DSH_HOME`**。
 
 ```sh
 DSH_BIN="${DSH_BIN:-dsh}"
-"$DSH_BIN" --version  # 确认输出 0.2.1-rc.3，再继续
+"$DSH_BIN" --version  # 确认输出 0.2.1-rc.2 或 0.2.1-rc.3，再继续
 
 PKG_DIR="${DSH_HOME:-$HOME/.dsh}/plugin-packages"
 mkdir -p "$PKG_DIR"
 curl -fL --retry 3 \
-  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.4.tgz" \
-  -o "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
+  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz" \
+  -o "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
 
 "$DSH_BIN" plugin --profile web add \
-  "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
+  "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
 ```
 
 先停止旧的 Web 进程，再在同一个终端运行：
@@ -48,12 +48,12 @@ curl -fL --retry 3 \
 
 ### Windows / Desktop
 
-Windows PowerShell 可先克隆或下载仓库，在仓库根目录执行。若普通 `dsh` 不是 `rc.3`，把 `$DshBin` 改为该版本的可执行文件路径：
+Windows PowerShell 可先克隆或下载仓库，在仓库根目录执行。若普通 `dsh` 不是受支持版本，把 `$DshBin` 改为该版本的可执行文件路径：
 
 ```powershell
 $DshBin = 'dsh'
-& $DshBin --version  # 确认输出 0.2.1-rc.3
-& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.4.tgz'
+& $DshBin --version  # 确认输出 0.2.1-rc.2 或 0.2.1-rc.3
+& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.5.tgz'
 # 停止旧的 Web 进程后，再执行：
 & $DshBin web
 ```
@@ -77,13 +77,13 @@ pnpm pack
 
 ### 限制
 
-此包的 `engines.dsh` 固定为 `0.2.1-rc.3`。其他 DSH 版本需要重新核对插件 API、主题 token 和全窗口背景层级，再调整兼容范围。
+此包的 `engines.dsh` 列出已验证的 `0.2.1-rc.2` 和 `0.2.1-rc.3`。其他 DSH 版本需要重新核对插件 API、主题 token 和全窗口背景层级，再调整兼容范围。
 
 视觉参考：[小红书「ASCII 风格的水母动效制作」](https://www.xiaohongshu.com/discovery/item/6ad97ec4000000002c0263ef)。插件中的动画为独立绘制。
 
 ## English
 
-An animated full-window theme plugin for DSH `0.2.1-rc.3`. It draws character-cell jellyfish, a faint grid, and drifting stars behind the Web interface while applying a dark translucent palette. Native DSH controls and interactions remain in place.
+An animated full-window theme plugin for DSH `0.2.1-rc.2` and `0.2.1-rc.3`. It draws character-cell jellyfish, a faint grid, and drifting stars behind the Web interface while applying a dark translucent palette. Native DSH controls and interactions remain in place.
 
 The Canvas layer is procedural and ships without remote image or video assets. It ignores pointer events, pauses in hidden tabs, honors reduced-motion settings, and adjusts for viewport size and pixel density.
 
@@ -93,20 +93,20 @@ The animation pauses when the page is hidden. Reduced-motion mode and intensity 
 
 ### Quick install (macOS / Linux, Web)
 
-This package requires DSH `0.2.1-rc.3`. Run these commands from any directory; cloning the repository is unnecessary. If your default `dsh` is another version, first point `DSH_BIN` to the `rc.3` executable, for example `export DSH_BIN="/path/to/rc.3/bin/dsh"`. **Use the same `rc.3` executable and `DSH_HOME` to install the plugin and restart Web.**
+This package has been tested with DSH `0.2.1-rc.2` and `0.2.1-rc.3`; other versions remain unverified. Run these commands from any directory; cloning the repository is unnecessary. If your default `dsh` is another version, first point `DSH_BIN` to a supported executable, for example `export DSH_BIN="/path/to/dsh"`. **Use the same DSH executable and `DSH_HOME` to install the plugin and restart Web.**
 
 ```sh
 DSH_BIN="${DSH_BIN:-dsh}"
-"$DSH_BIN" --version  # Confirm 0.2.1-rc.3 before continuing
+"$DSH_BIN" --version  # Confirm 0.2.1-rc.2 or 0.2.1-rc.3 before continuing
 
 PKG_DIR="${DSH_HOME:-$HOME/.dsh}/plugin-packages"
 mkdir -p "$PKG_DIR"
 curl -fL --retry 3 \
-  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.4.tgz" \
-  -o "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
+  "https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz" \
+  -o "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
 
 "$DSH_BIN" plugin --profile web add \
-  "$PKG_DIR/dsh-background-style-plugin-0.1.4.tgz"
+  "$PKG_DIR/dsh-background-style-plugin-0.1.5.tgz"
 ```
 
 Stop the old Web process, then run in the same shell:
@@ -119,12 +119,12 @@ The persistent package directory keeps the local dependency path available after
 
 ### Windows / Desktop
 
-On Windows, clone or download the repository first. Run these commands from its root in PowerShell. If plain `dsh` is not `rc.3`, set `$DshBin` to that version's executable path:
+On Windows, clone or download the repository first. Run these commands from its root in PowerShell. If plain `dsh` is not a supported version, set `$DshBin` to that version's executable path:
 
 ```powershell
 $DshBin = 'dsh'
-& $DshBin --version  # Confirm 0.2.1-rc.3
-& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.4.tgz'
+& $DshBin --version  # Confirm 0.2.1-rc.2 or 0.2.1-rc.3
+& $DshBin plugin --profile web add '.\dist\dsh-background-style-plugin-0.1.5.tgz'
 # Stop the old Web process, then run:
 & $DshBin web
 ```
@@ -146,7 +146,7 @@ pnpm pack
 
 The Host entry and browser bundle are declared in `package.json`; the bundle patch installs the plugin into a profile. The browser half uses the official theme and Settings slot services, and does not patch DSH source files.
 
-Compatibility is limited to the exact tested DSH release in `engines.dsh`. Recheck the client APIs, CSS tokens, and window layers before expanding the supported version range.
+`engines.dsh` lists the tested `0.2.1-rc.2` and `0.2.1-rc.3` releases. Recheck the client APIs, CSS tokens, and window layers before expanding the supported version range.
 
 ### Visual reference
 
