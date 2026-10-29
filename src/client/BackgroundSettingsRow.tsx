@@ -2,11 +2,13 @@ import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-cli
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type { createBackgroundSettingsStore } from './settings-store.ts'
 import css from './BackgroundSettingsRow.module.css'
+import { MAX_COUNT } from './preferences.ts'
 
 /** Settings writes supplied by the plugin body. */
 export interface BackgroundSettingsInjected {
   setEnabled(enabled: boolean): void
   setIntensity(intensity: number): void
+  setCount(count: number): void
 }
 
 type Props = PropsRuntime<'settings.general.item'>
@@ -15,9 +17,10 @@ type Props = PropsRuntime<'settings.general.item'>
   & BackgroundSettingsInjected
 
 /** Display the plugin toggle and animation strength in General settings. */
-export function BackgroundSettingsRow({ t, useStore, setEnabled, setIntensity }: Props) {
+export function BackgroundSettingsRow({ t, useStore, setEnabled, setIntensity, setCount }: Props) {
   const enabled = useStore(state => state.enabled)
   const intensity = useStore(state => state.intensity)
+  const count = useStore(state => state.count)
 
   return <div className={css.row}>
     <div className={css.copy}>
@@ -34,5 +37,12 @@ export function BackgroundSettingsRow({ t, useStore, setEnabled, setIntensity }:
         onChange={event => { setIntensity(Number(event.currentTarget.value)) }} />
       <output>{intensity}%</output>
     </label>
+    <label className={css.slider}>
+      <span>{t('count')}</span>
+      <input type="range" min="0" max={MAX_COUNT} step="1" value={count} aria-label={t('count')}
+        onChange={event => { setCount(Number(event.currentTarget.value)) }} />
+      <output>{count}</output>
+    </label>
+    <div className={css.hint}>{t('countHint')}</div>
   </div>
 }

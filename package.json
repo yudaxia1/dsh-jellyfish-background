@@ -1,6 +1,6 @@
 {
   "name": "dsh-background-style-plugin",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Full-window animated deep-sea ASCII jellyfish theme for DSH Web",
   "type": "module",
   "main": "lib/index.js",
@@ -55,6 +55,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "test": "node --test tests/*.test.ts",
     "bundle": "tsdown"
   },
   "license": "MIT"

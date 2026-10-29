@@ -1,4 +1,6 @@
 /** Canvas scene kept separate from the DSH UI tree and all pointer handling. */
+import { DEFAULT_COUNT, MAX_COUNT, normalizeCount } from './preferences.ts'
+
 type Jellyfish = {
   x: number
   y: number
@@ -15,6 +17,14 @@ const JELLYFISH: readonly Jellyfish[] = [
   { x: 0.42, y: 0.94, size: 0.072, speed: 6, phase: 0.25, tint: 1 },
   { x: 0.06, y: 0.08, size: 0.082, speed: 8, phase: 0.85, tint: 1 },
   { x: 0.58, y: 0.63, size: 0.058, speed: 5, phase: 0.61, tint: 0 },
+  ...Array.from({ length: MAX_COUNT - DEFAULT_COUNT }, (_, index): Jellyfish => ({
+    x: (0.35 + index * 0.61803398875) % 1,
+    y: 0.05 + random(index + 1300) * 0.85,
+    size: 0.052 + random(index + 1400) * 0.045,
+    speed: 5 + random(index + 1500) * 5,
+    phase: random(index + 1600),
+    tint: index % 2,
+  })),
 ]
 
 const DENSE = 'S%X8@#'
@@ -38,34 +48,48 @@ function ease(t: number): number {
 export class AbyssScene {
   private readonly canvas: HTMLCanvasElement
   private readonly context: CanvasRenderingContext2D
+  private readonly background: HTMLCanvasElement
+  private readonly backgroundContext: CanvasRenderingContext2D
   private readonly motion = matchMedia('(prefers-reduced-motion: reduce)')
-  private readonly started = performance.now()
   private frame = 0
+  private lastTick = 0
   private lastPaint = 0
+  private seconds = 0
+  private swimSeconds = 0
   private width = 0
   private height = 0
   private intensity: number
+  private count: number
+  private readingShade: CanvasGradient | undefined
 
   private readonly onResize = (): void => { this.resize() }
   private readonly onVisibility = (): void => { this.resume() }
   private readonly onMotion = (): void => { this.resume() }
   private readonly tick = (now: number): void => {
+    const delta = this.lastTick === 0 ? 0 : clamp((now - this.lastTick) / 1000, 0, 0.1)
+    this.lastTick = now
+    this.seconds += delta
+    this.swimSeconds += delta * (0.4 + this.intensity / 100 * 0.8)
     if (now - this.lastPaint >= 30) {
       this.lastPaint = now
-      this.paint((now - this.started) / 1000)
+      this.paint()
     }
     this.frame = requestAnimationFrame(this.tick)
   }
 
   /** Mount the background canvas and start only when motion is allowed. */
-  constructor(intensity: number) {
+  constructor(intensity: number, count = DEFAULT_COUNT) {
     this.intensity = clamp(intensity, 0, 100)
+    this.count = normalizeCount(count)
     this.canvas = document.createElement('canvas')
+    this.background = document.createElement('canvas')
     this.canvas.dataset.dshAbyssCanvas = ''
     this.canvas.setAttribute('aria-hidden', 'true')
     const context = this.canvas.getContext('2d', { alpha: false })
-    if (context === null) throw new Error('The deep-sea background needs a 2D canvas context')
+    const backgroundContext = this.background.getContext('2d', { alpha: false })
+    if (context === null || backgroundContext === null) throw new Error('The deep-sea background needs a 2D canvas context')
     this.context = context
+    this.backgroundContext = backgroundContext
     document.body.append(this.canvas)
     window.addEventListener('resize', this.onResize)
     document.addEventListener('visibilitychange', this.onVisibility)
@@ -80,6 +104,12 @@ export class AbyssScene {
     this.resume()
   }
 
+  /** Update the population immediately while keeping existing paths and phases. */
+  setCount(count: number): void {
+    this.count = normalizeCount(count)
+    if (!document.hidden) this.paint()
+  }
+
   /** Remove every resource owned by this plugin instance. */
   dispose(): void {
     cancelAnimationFrame(this.frame)
@@ -87,6 +117,8 @@ export class AbyssScene {
     document.removeEventListener('visibilitychange', this.onVisibility)
     this.motion.removeEventListener('change', this.onMotion)
     this.canvas.remove()
+    this.background.width = 0
+    this.background.height = 0
   }
 
   private resize(): void {
@@ -96,27 +128,29 @@ export class AbyssScene {
     this.canvas.width = Math.round(this.width * ratio)
     this.canvas.height = Math.round(this.height * ratio)
     this.context.setTransform(ratio, 0, 0, ratio, 0, 0)
-    this.paint(this.motion.matches || this.intensity === 0 ? 0 : (performance.now() - this.started) / 1000)
+    this.cacheBackground()
+    if (!document.hidden) this.paint()
   }
 
   private resume(): void {
     cancelAnimationFrame(this.frame)
     this.frame = 0
+    this.lastTick = 0
+    this.lastPaint = 0
     if (document.hidden) return
+    this.paint()
     if (this.motion.matches || this.intensity === 0) {
-      this.paint(0)
       return
     }
     this.frame = requestAnimationFrame(this.tick)
   }
 
-  private paint(seconds: number): void {
-    const ctx = this.context
+  /** Cache static colors and grid at CSS resolution to limit extra canvas memory. */
+  private cacheBackground(): void {
+    this.background.width = this.width
+    this.background.height = this.height
+    const ctx = this.backgroundContext
     const { width, height } = this
-    ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = '#030817'
-    ctx.fillRect(0, 0, width, height)
-
     const bottomGlow = ctx.createRadialGradient(width * 0.5, height * 1.03, 0, width * 0.5, height * 1.03, Math.max(width, height) * 0.92)
     bottomGlow.addColorStop(0, '#123d66')
     bottomGlow.addColorStop(0.55, '#0a2346')
@@ -131,19 +165,26 @@ export class AbyssScene {
     for (let y = 0; y < height; y += 27) { ctx.moveTo(0, y + 0.5); ctx.lineTo(width, y + 0.5) }
     ctx.stroke()
 
-    this.drawStars(seconds)
-    const motion = 0.4 + this.intensity / 100 * 0.8
-    for (let i = 0; i < JELLYFISH.length; i += 1) {
+    this.readingShade = this.context.createRadialGradient(width * 0.52, height * 0.48, 35, width * 0.52, height * 0.48, Math.max(280, width * 0.38))
+    this.readingShade.addColorStop(0, 'rgba(3, 8, 23, 0.37)')
+    this.readingShade.addColorStop(1, 'rgba(3, 8, 23, 0)')
+  }
+
+  private paint(): void {
+    const ctx = this.context
+    const { width, height } = this
+    ctx.drawImage(this.background, 0, 0, width, height)
+    this.drawStars(this.seconds)
+    for (let i = 0; i < this.count; i += 1) {
       const jellyfish = JELLYFISH[i]
-      if (jellyfish !== undefined) this.drawJellyfish(jellyfish, i, seconds * motion)
+      if (jellyfish !== undefined) this.drawJellyfish(jellyfish, i, this.swimSeconds)
     }
 
     // Reading and typing zones stay quieter without duplicating DSH's own UI.
-    const readingShade = ctx.createRadialGradient(width * 0.52, height * 0.48, 35, width * 0.52, height * 0.48, Math.max(280, width * 0.38))
-    readingShade.addColorStop(0, 'rgba(3, 8, 23, 0.37)')
-    readingShade.addColorStop(1, 'rgba(3, 8, 23, 0)')
-    ctx.fillStyle = readingShade
-    ctx.fillRect(0, 0, width, height)
+    if (this.readingShade !== undefined) {
+      ctx.fillStyle = this.readingShade
+      ctx.fillRect(0, 0, width, height)
+    }
   }
 
   private drawStars(seconds: number): void {
@@ -155,7 +196,8 @@ export class AbyssScene {
     for (let i = 0; i < STAR_COUNT; i += 1) {
       const x = random(i + 11) * this.width
       const shift = seconds * (1.4 + random(i + 400) * 3)
-      const y = (random(i + 1000) * this.height - shift + this.height) % this.height
+      const baseY = random(i + 1000) * this.height - shift
+      const y = ((baseY % this.height) + this.height) % this.height
       const blink = 0.55 + 0.45 * Math.sin(seconds * (0.5 + random(i + 70)) + i)
       const alpha = (0.08 + 0.22 * blink) * strength
       ctx.fillStyle = `rgba(189, 222, 255, ${alpha})`

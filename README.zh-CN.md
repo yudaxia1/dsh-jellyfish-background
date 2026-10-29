@@ -4,7 +4,7 @@
 
 ![DSH 实际运行中的水母背景动图](assets/demo.gif)
 
-实际界面：[全窗口截图](assets/screenshot.png) · [设置开关与强度滑块](assets/settings.png)
+实际界面：[全窗口截图](assets/screenshot.png) · [设置开关与强度滑块](assets/settings.jpg)
 
 适用于 DSH `0.2.1-rc.2` 和 `0.2.1-rc.3` Web 界面的动态主题插件。它在整个应用窗口后方绘制字符方格水母、暗蓝网格和漂浮星点，并把面板切换为深色半透明外观。DSH 原有的侧边栏、聊天、设置和输入功能继续使用。
 
@@ -12,9 +12,9 @@
 
 ## 使用
 
-首次安装后背景默认开启。打开 **设置 → 通用设置 → 深海字符水母**，可以关闭背景或调整动效强度。关闭时恢复此前选择的主题。启用期间若选择 DSH 的其他外观，该选择会在关闭本插件后生效。
+首次安装后背景默认开启。打开 **设置 → 通用设置 → 深海字符水母**，可以关闭背景、调整动效强度和水母数量。水母数量可选 **0–12 只，默认 6 只**；设为 0 时仅保留星点背景。调整立即生效，刷新后保留；旧版本设置自动沿用 6 只。关闭时恢复此前选择的主题。启用期间若选择 DSH 的其他外观，该选择会在关闭本插件后生效。
 
-页面隐藏时停止绘制；系统开启“减少动态效果”或动效强度设为 0 时显示静态画面。设置保存在当前浏览器的 `localStorage`，同一来源的多个标签页会同步。
+页面隐藏时暂停并保留动画进度；恢复页面或调整动效强度时延续当前位置。系统开启“减少动态效果”或动效强度设为 0 时显示静态画面。设置保存在当前浏览器的 `localStorage`，同一来源的多个标签页会同步。
 
 ## 在线安装（Web）
 
@@ -22,7 +22,7 @@
 
 ```sh
 dsh --version
-dsh plugin --profile web add https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.5.tgz
+dsh plugin --profile web add https://raw.githubusercontent.com/yudaxia1/dsh-jellyfish-background/main/dist/dsh-background-style-plugin-0.1.6.tgz
 ```
 
 第一行应输出 `0.2.1-rc.2` 或 `0.2.1-rc.3`。安装完成后，**先停止旧的 Web 进程**，再运行：
@@ -31,7 +31,7 @@ dsh plugin --profile web add https://raw.githubusercontent.com/yudaxia1/dsh-jell
 dsh web
 ```
 
-安装和启动要使用**同一个 `dsh` 可执行文件及同一个 `DSH_HOME`**。如果机器上有多个 DSH 版本，把上述每处 `dsh` 换成受支持版本的完整路径。启动后在 **设置 → 通用设置 → 深海字符水母** 调整开关和强度。
+安装和启动要使用**同一个 `dsh` 可执行文件及同一个 `DSH_HOME`**。如果机器上有多个 DSH 版本，把上述每处 `dsh` 换成受支持版本的完整路径。启动后在 **设置 → 通用设置 → 深海字符水母** 调整开关、强度和数量。
 
 Desktop：首次打开并初始化 profile 后完全退出应用，使用安装版附带的 `dsh` 命令把上述安装命令中的 `--profile web` 改为 `--profile desktop`，然后重新打开应用。
 

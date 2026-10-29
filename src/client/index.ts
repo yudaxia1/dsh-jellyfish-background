@@ -9,6 +9,7 @@ import { BackgroundSettingsRow, type BackgroundSettingsInjected } from './Backgr
 import { createBackgroundSettingsStore } from './settings-store.ts'
 import { en, zh, type BackgroundKey } from './locales.ts'
 import { AbyssScene } from './scene.ts'
+import { DEFAULT_COUNT, DEFAULT_INTENSITY, normalizeCount, normalizeIntensity, parsePreferences, type BackgroundPreferences } from './preferences.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -19,7 +20,6 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 const THEME_ID = 'dsh-abyss-jellyfish'
 const STORAGE_KEY = 'dsh-background-style-plugin:settings'
-const DEFAULT_INTENSITY = 65
 
 const THEME_TOKENS = {
   '--dsw-alias-bg-base': 'rgb(5 14 34 / 0.48)',
@@ -55,30 +55,18 @@ body[data-dsh-abyss] canvas[data-dsh-abyss-canvas] {
 }
 `
 
-interface SavedSettings {
-  enabled: boolean
-  intensity: number
-}
-
-function readSettings(): SavedSettings {
-  if (typeof localStorage === 'undefined') return { enabled: true, intensity: DEFAULT_INTENSITY }
+function readSettings(): BackgroundPreferences {
+  if (typeof localStorage === 'undefined') return parsePreferences(null)
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw === null) return { enabled: true, intensity: DEFAULT_INTENSITY }
-    const parsed: unknown = JSON.parse(raw)
-    if (typeof parsed !== 'object' || parsed === null) return { enabled: false, intensity: DEFAULT_INTENSITY }
-    const record = parsed as Record<string, unknown>
-    const intensity = typeof record.intensity === 'number' && Number.isFinite(record.intensity)
-      ? Math.min(100, Math.max(0, Math.round(record.intensity / 5) * 5)) : DEFAULT_INTENSITY
-    return { enabled: record.enabled === true, intensity }
+    return parsePreferences(localStorage.getItem(STORAGE_KEY))
   } catch (error) {
     // A browser may deny storage access or the saved JSON may be corrupt.
     void error
-    return { enabled: false, intensity: DEFAULT_INTENSITY }
+    return { enabled: false, intensity: DEFAULT_INTENSITY, count: DEFAULT_COUNT }
   }
 }
 
-function writeSettings(settings: SavedSettings): void {
+function writeSettings(settings: BackgroundPreferences): void {
   if (typeof localStorage === 'undefined') return
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
@@ -112,12 +100,13 @@ export function apply(ctx: ClientContext): void {
   let bound: BoundActions<typeof store> | undefined
   let enabled = false
   let intensity = saved.intensity
+  let count = saved.count
   let previousPreference = 'system'
   let scene: AbyssScene | undefined
   let themeRestoreQueued = false
 
-  const sync = (): void => { bound?.sync(enabled, intensity) }
-  const persist = (): void => { writeSettings({ enabled, intensity }) }
+  const sync = (): void => { bound?.sync(enabled, intensity, count) }
+  const persist = (): void => { writeSettings({ enabled, intensity, count }) }
   const disable = (restore: boolean): void => {
     if (!enabled) return
     enabled = false
@@ -134,7 +123,7 @@ export function apply(ctx: ClientContext): void {
     } else {
       previousPreference = theme.getTheme().active.id === THEME_ID ? 'system' : theme.getTheme().preference
       if (typeof document !== 'undefined') {
-        const nextScene = new AbyssScene(intensity)
+        const nextScene = new AbyssScene(intensity, count)
         document.body.setAttribute('data-dsh-abyss', '')
         scene = nextScene
       }
@@ -145,8 +134,14 @@ export function apply(ctx: ClientContext): void {
     if (save) persist()
   }
   const setIntensity = (next: number, save = true): void => {
-    intensity = Math.min(100, Math.max(0, Math.round(next / 5) * 5))
+    intensity = normalizeIntensity(next)
     scene?.setIntensity(intensity)
+    sync()
+    if (save) persist()
+  }
+  const setCount = (next: number, save = true): void => {
+    count = normalizeCount(next)
+    scene?.setCount(count)
     sync()
     if (save) persist()
   }
@@ -169,6 +164,7 @@ export function apply(ctx: ClientContext): void {
       if (event.key !== STORAGE_KEY) return
       const incoming = readSettings()
       setIntensity(incoming.intensity, false)
+      setCount(incoming.count, false)
       setEnabled(incoming.enabled, false)
     }
     ctx.effect(() => {
@@ -189,6 +185,7 @@ export function apply(ctx: ClientContext): void {
       return {
         setEnabled: value => { setEnabled(value) },
         setIntensity: value => { setIntensity(value) },
+        setCount: value => { setCount(value) },
       }
     },
   }, BackgroundSettingsRow))
